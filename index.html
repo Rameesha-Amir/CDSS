@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Decision Support System (CDSS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F2F2F2;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-hover:hover {
+            transform: translateY(-1px);
+        }
+        .logo-placeholder {
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body class="text-[#212529] font-sans">
+
+    <div id="login-page" class="min-h-screen flex items-center justify-center bg-white" style="background-color: #F2F2F2;">
+        <div class="p-8 md:p-12 bg-white rounded-3xl shadow-xl w-full max-w-sm border-t-8 border-[#E6E6FA] transition-all duration-300 transform scale-95 hover:scale-100">
+            <h1 class="text-3xl font-bold text-center mb-6 text-gray-800 flex items-center justify-center">
+                <span class="logo-placeholder mr-3">🩺</span>
+                CDSS
+            </h1>
+            <p class="text-center text-gray-500 mb-8">Login to your account</p>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-semibold text-gray-600 mb-2">Email Address</label>
+                    <input type="email" id="email" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF] transition-all duration-200" placeholder="Enter your email">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-semibold text-gray-600 mb-2">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF] transition-all duration-200" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-3 bg-[#007BFF] text-white font-bold rounded-xl hover:bg-blue-600 transition-colors duration-200 shadow-md btn-hover">Login</button>
+            </form>
+            <div class="mt-6 text-center">
+                <a href="#" class="text-[#B57EDC] hover:underline text-sm transition-colors duration-200">Forgot Password?</a>
+            </div>
+        </div>
+    </div>
+    <div id="app-container" class="hidden min-h-screen flex" style="background-color: #F2F2F2;">
+
+        <aside class="w-64 bg-[#F6F3FF] p-6 shadow-lg transition-all duration-300 fixed inset-y-0 left-0 z-50 flex flex-col justify-between">
+            <div>
+                <div class="mb-8 flex items-center justify-center md:justify-start">
+                    <span class="logo-placeholder mr-2 text-[#1B4965]">🩺</span>
+                    <h2 class="text-2xl font-bold text-[#1B4965] transition-colors duration-200">CDSS</h2>
+                </div>
+                <nav>
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#" class="block py-2 px-4 rounded-xl font-medium text-gray-700 hover:bg-[#E6E6FA] hover:text-[#1B4965] transition-all duration-200 active-link bg-[#E6E6FA] text-[#1B4965] flex items-center" onclick="showView('dashboard-view')">
+                                <span class="mr-2">📊</span> Dashboard
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="block py-2 px-4 rounded-xl font-medium text-gray-700 hover:bg-[#E6E6FA] hover:text-[#1B4965] transition-all duration-200 flex items-center" onclick="showView('patient-form-view')">
+                                <span class="mr-2">🧑‍⚕️</span> Patients
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="block py-2 px-4 rounded-xl font-medium text-gray-700 hover:bg-[#E6E6FA] hover:text-[#1B4965] transition-all duration-200 flex items-center" onclick="showView('reports-view')">
+                                <span class="mr-2">📄</span> Reports
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="block py-2 px-4 rounded-xl font-medium text-gray-700 hover:bg-[#E6E6FA] hover:text-[#1B4965] transition-all duration-200 flex items-center" onclick="showView('settings-view')">
+                                <span class="mr-2">⚙️</span> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <button onclick="logout()" class="w-full py-2 px-4 rounded-xl text-left font-medium text-[#6C757D] hover:bg-gray-200 transition-colors duration-200 flex items-center">
+                    <span class="mr-2">🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 p-8 overflow-y-auto ml-64">
+            
+            <header class="flex justify-between items-center mb-8 pb-4 border-b border-[#E6E6FA]">
+                <h1 id="page-title" class="text-3xl font-bold text-[#1B4965]">Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <p class="text-lg font-medium">Welcome, <span id="user-name">Dr. [Name]</span></p>
+                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white text-lg font-semibold">D</div>
+                </div>
+            </header>
+
+            <div id="content-views">
+
+                <div id="dashboard-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-[#E6E6FA] transition-all duration-200 card-hover col-span-2">
+                        <h3 class="text-xl font-semibold text-[#00C49A] mb-4">Today’s Patient Schedule</h3>
+                        <p class="text-gray-600">Total 5 patients scheduled (3 with verified insurance).</p>
+                        <ul class="mt-4 space-y-3">
+                            <li class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <span>Patient A</span>
+                                <span class="text-sm font-semibold text-[#007BFF]">Insurance Verified</span>
+                                <span class="text-sm text-gray-500">10:00 AM</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <span>Patient B</span>
+                                <span class="text-sm font-semibold text-[#DC3545]">Cash Pay - Pending</span>
+                                <span class="text-sm text-gray-500">10:30 AM</span>
+                            </li>
+                             <li class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <span>Patient C (Critical)</span>
+                                <span class="text-sm font-semibold text-[#007BFF]">Insurance Verified</span>
+                                <span class="text-sm text-gray-500">11:00 AM</span>
+                            </li>
+                        </ul>
+                        <button class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-xl text-sm hover:bg-gray-300 transition-colors duration-200 btn-hover">Full Schedule</button>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-[#E6E6FA] transition-all duration-200 card-hover">
+                        <h3 class="text-xl font-semibold text-[#DC3545] mb-4">Critical Clinical Alerts</h3>
+                        
+                        <div class="border-b border-dashed border-red-300 pb-3 mb-3">
+                            <div class="flex items-start space-x-2 text-[#DC3545]">
+                                <span>🚨</span>
+                                <p class="font-bold text-sm">Critical: Patient C - High Risk Score</p>
+                            </div>
+                            <p class="text-gray-600 mt-1 text-sm">
+                                **Predicted Readmission Risk: 82%** in 30 days.
+                            </p>
+                            <span class="text-xs text-[#B57EDC] italic">Top Factors: Vitals, Low Hgb.</span>
+                        </div>
+                        
+                        <div class="flex items-start space-x-2 text-[#DC3545] mt-2">
+                            <span>❌</span>
+                            <p class="font-bold text-sm">Severe: Patient D - Drug Interaction</p>
+                        </div>
+                        <p class="text-gray-600 mt-1 text-sm">Review prescription for drug-drug interaction.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-[#E6E6FA] transition-all duration-200 card-hover">
+                        <h3 class="text-xl font-semibold text-[#007BFF] mb-4">System Health Status 🔗</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 bg-green-50 rounded-lg">
+                                <p class="text-sm text-gray-700 font-medium">EHR Connection:</p>
+                                <span class="text-sm font-bold text-[#00C49A] flex items-center">
+                                    <span class="w-3 h-3 bg-[#00C49A] rounded-full mr-1"></span> Connected
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-700 font-medium">Last Data Sync:</p>
+                                <span class="text-sm font-bold text-gray-500">3 minutes ago</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-700 font-medium">System Uptime (24h):</p>
+                                <span class="text-sm font-bold text-[#00C49A]">99.9%</span>
+                            </div>
+                        </div>
+                        <button class="mt-4 px-4 py-2 bg-[#E6E6FA] text-gray-700 rounded-xl text-sm hover:bg-gray-300 transition-colors duration-200 btn-hover">View Audit Log</button>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-3xl shadow-lg border border-[#E6E6FA] transition-all duration-200 card-hover col-span-2">
+                        <h3 class="text-xl font-semibold text-[#B57EDC] mb-4">Billing & Compliance Status</h3>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-1">
+                                <p class="text-sm text-gray-700 font-medium">Claims Pending:</p>
+                                <span class="text-lg font-bold text-[#DC3545]">12</span>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm text-gray-700 font-medium">Uninsured Patients (Mo.):</p>
+                                <span class="text-lg font-bold text-[#B57EDC]">8</span>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm font-medium text-[#00C49A] flex items-center">
+                                    <span class="mr-1">🔒</span> Compliance Audit:
+                                </p>
+                                <span class="text-lg font-bold text-[#00C49A]">HIPAA OK</span>
+                            </div>
+                        </div>
+                        <button class="mt-4 px-4 py-2 bg-[#007BFF] text-white rounded-xl text-sm hover:bg-blue-600 transition-colors duration-200 btn-hover">Manage Financials</button>
+                    </div>
+
+                </div>
+                <div id="patient-form-view" class="hidden bg-white p-8 rounded-3xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-[#B57EDC] mb-6">Enter Patient Data, Vitals & Diagnostics</h2>
+                    <form>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 pb-4 border-b border-[#E6E6FA]">
+                            <div>
+                                <label for="patient-name" class="block text-sm font-semibold text-gray-700 mb-2">Patient Name</label>
+                                <input type="text" id="patient-name" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label for="doctor-name" class="block text-sm font-semibold text-gray-700 mb-2">Attending/Referral Doctor</label>
+                                <input type="text" id="doctor-name" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="Type Doctor's Name or ID">
+                            </div>
+                            <div>
+                                <label for="age" class="block text-sm font-semibold text-gray-700 mb-2">Age</label>
+                                <input type="number" id="age" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="35">
+                            </div>
+                            <div>
+                                <label for="gender" class="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                                <select id="gender" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]">
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 border p-4 rounded-xl border-[#E6E6FA]">
+                            <h3 class="text-lg font-semibold text-[#B57EDC] mb-4">Current Vitals</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                <div>
+                                    <label for="temp" class="block text-sm font-semibold text-gray-700 mb-2">Temperature (°F)</label>
+                                    <input type="text" id="temp" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B57EDC]" placeholder="98.6">
+                                </div>
+                                <div>
+                                    <label for="hr" class="block text-sm font-semibold text-gray-700 mb-2">Heart Rate (bpm)</label>
+                                    <input type="number" id="hr" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B57EDC]" placeholder="72">
+                                </div>
+                                <div>
+                                    <label for="bp" class="block text-sm font-semibold text-gray-700 mb-2">Blood Pressure (BP)</label>
+                                    <input type="text" id="bp" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B57EDC]" placeholder="120/80">
+                                </div>
+                                <div>
+                                    <label for="spo2" class="block text-sm font-semibold text-gray-700 mb-2">SpO2 (%)</label>
+                                    <input type="number" id="spo2" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B57EDC]" placeholder="98">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 border p-4 rounded-xl border-[#E6E6FA] bg-green-50">
+                            <h3 class="text-lg font-semibold text-[#00C49A] mb-4 flex items-center">
+                                <span class="mr-2">🔬</span> Lab & Diagnostic Results
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div>
+                                    <label for="wbc" class="block text-sm font-semibold text-gray-700 mb-2">WBC Count (K/uL)</label>
+                                    <input type="number" id="wbc" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C49A]" placeholder="10.5">
+                                </div>
+                                <div>
+                                    <label for="hgb" class="block text-sm font-semibold text-gray-700 mb-2">Hemoglobin (g/dL)</label>
+                                    <input type="number" id="hgb" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C49A]" placeholder="13.8">
+                                </div>
+                                <div>
+                                    <label for="glucose" class="block text-sm font-semibold text-gray-700 mb-2">Blood Glucose (mg/dL)</label>
+                                    <input type="number" id="glucose" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C49A]" placeholder="110">
+                                </div>
+                                <div>
+                                    <label for="imaging" class="block text-sm font-semibold text-gray-700 mb-2">Imaging Findings (X-Ray/MRI)</label>
+                                    <input type="text" id="imaging" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C49A]" placeholder="e.g., Clear lungs, Herniated Disc">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="md:col-span-2">
+                                <label for="symptoms" class="block text-sm font-semibold text-gray-700 mb-2">Chief Complaint & Symptoms</label>
+                                <textarea id="symptoms" rows="3" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="Describe the patient's primary complaint and associated symptoms..."></textarea>
+                            </div>
+                            <div class="border p-4 rounded-xl border-[#E6E6FA]">
+                                <h3 class="text-sm font-semibold text-gray-700 mb-3">Patient Classification</h3>
+                                <div class="space-y-2">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="patient_type" value="regular" class="form-radio text-[#007BFF] h-4 w-4">
+                                        <span class="ml-2 text-gray-700">Regular Check-up</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="patient_type" value="new" class="form-radio text-[#007BFF] h-4 w-4">
+                                        <span class="ml-2 text-gray-700">New Patient</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="patient_type" value="emergency" class="form-radio text-[#007BFF] h-4 w-4">
+                                        <span class="ml-2 text-gray-700">Urgent/Emergency</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 border p-4 rounded-xl border-[#E6E6FA] bg-yellow-50">
+                            <h3 class="text-lg font-semibold text-[#DC3545] mb-4 flex items-center">
+                                <span class="mr-2">💊</span> Medication & Safety Check
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="current-meds" class="block text-sm font-semibold text-gray-700 mb-2">Active Medications</label>
+                                    <textarea id="current-meds" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC3545]" placeholder="e.g., Aspirin 81mg, Lisinopril 10mg"></textarea>
+                                </div>
+                                <div>
+                                    <label for="allergies" class="block text-sm font-semibold text-gray-700 mb-2">Known Allergies</label>
+                                    <textarea id="allergies" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DC3545]" placeholder="e.g., Penicillin, Peanuts"></textarea>
+                                </div>
+                            </div>
+                            <button type="button" class="mt-4 px-6 py-2 bg-[#DC3545] text-white font-semibold rounded-xl hover:bg-red-700 transition-colors duration-200 btn-hover">Run Interaction Check</button>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4 pt-4 border-t border-[#E6E6FA]">
+                            <button type="button" class="px-6 py-3 bg-[#00C49A] text-white font-semibold rounded-xl hover:bg-[#00A17E] transition-colors duration-200 btn-hover">Save to EHR</button>
+                            <button type="button" class="px-6 py-3 bg-[#007BFF] text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-200 btn-hover" onclick="showView('results-view')">Run CDSS Analysis</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="results-view" class="hidden bg-white p-8 rounded-3xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-[#007BFF] mb-6">CDSS Analysis: Diagnosis & Management Plan</h2>
+                    
+                    <div class="mb-6 p-6 rounded-2xl border-4 border-[#DC3545] bg-red-50 shadow-md">
+                        <h3 class="text-xl font-bold text-[#DC3545] mb-3 flex items-center">
+                            <span class="mr-2 text-2xl">🚨</span> Predictive Risk Assessment
+                        </h3>
+                        <div class="flex justify-between items-center mb-4 border-b pb-3 border-red-200">
+                            <p class="text-lg font-semibold text-gray-800">Predicted Event:</p>
+                            <span class="text-2xl font-extrabold text-[#DC3545]">Stroke Risk (Next 6 Months)</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Risk Score:</p>
+                                <span class="text-4xl font-black text-[#DC3545]">7.8 / 10</span>
+                                <p class="text-sm text-gray-500">
+                                    *Score is calculated based on CHADS-VASc, Vitals, and Lab results (e.g., High Blood Glucose).
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 mb-1">Top Contributing Factors:</p>
+                                <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                                    <li class="font-semibold text-red-600">Uncontrolled Hypertension (BP: 160/100)</li>
+                                    <li>History of Atrial Fibrillation (Hx)</li>
+                                    <li>**Elevated Blood Glucose (Lab)**</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-red-200 rounded-xl">
+                            <p class="font-bold text-[#DC3545]">Action Required:</p>
+                            <p class="text-sm text-gray-800">Strongly recommend adjusting antihypertensive regimen and adding an anti-coagulant, pending provider review.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200 shadow-sm transition-all duration-200 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold text-[#007BFF]">Viral Infection</h3>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-600">AI Confidence Level: <span class="font-bold text-[#00C49A]">85%</span></p>
+                                    <div class="w-32 bg-gray-200 rounded-full h-2.5 mt-1">
+                                        <div class="bg-gradient-to-r from-[#00C49A] to-[#00997A] h-2.5 rounded-full" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-4">Based on symptoms of fever, cough, and fatigue.</p>
+                            
+                            <div class="text-[#B57EDC] font-semibold flex items-center mb-2">
+                                <span>💡</span>
+                                <span class="ml-2">Supporting Data: Normal WBC count (WBC: 6.5 K/uL).</span>
+                            </div>
+
+                            <div class="mt-4 p-3 rounded-xl bg-[#F6F3FF] border border-[#E6E6FA]">
+                                <h4 class="font-bold text-[#007BFF] mb-2">CDSS Management Recommendation:</h4>
+                                <p class="text-sm text-gray-700">Acetaminophen (500mg) PRN for fever. Rest and hydration.</p>
+                                <div class="text-[#00C49A] font-semibold flex items-center mt-2">
+                                    <span>✅</span>
+                                    <span class="ml-2 text-sm">Interaction Status: No contraindications found.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200 shadow-sm transition-all duration-200 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold text-[#007BFF]">Bacterial Pneumonia</h3>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-600">AI Confidence Level: <span class="font-bold text-[#B57EDC]">55%</span></p>
+                                    <div class="w-32 bg-gray-200 rounded-full h-2.5 mt-1">
+                                        <div class="bg-gradient-to-r from-[#00C49A] to-[#00997A] h-2.5 rounded-full" style="width: 55%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-4">Possible differential given elevated white blood cell count (if WBC > 11.0).</p>
+                            
+                            <div class="text-[#B57EDC] font-semibold flex items-center mb-2">
+                                <span>💡</span>
+                                <span class="ml-2">Recommended Tests: Chest X-Ray (Rule out consolidation).</span>
+                            </div>
+
+                            <div class="mt-4 p-3 rounded-xl bg-red-100 border border-[#DC3545]">
+                                <h4 class="font-bold text-[#007BFF] mb-2">CDSS Medication Recommendation:</h4>
+                                <p class="text-sm text-gray-700">Azithromycin (500mg) as empirical treatment.</p>
+                                <div class="text-[#DC3545] font-semibold flex items-center mt-2">
+                                    <span>❌</span>
+                                    <span class="ml-2 text-sm">Interaction Status: High risk of **QT Prolongation** with existing medication. **Do Not Prescribe.**</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button class="px-6 py-3 bg-[#B57EDC] text-white rounded-xl hover:bg-[#A567C7] transition-colors duration-200 btn-hover">Generate Full Clinical Report</button>
+                    </div>
+                </div>
+                <div id="reports-view" class="hidden">
+                    <div class="bg-white p-8 rounded-3xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-[#B57EDC] mb-6">System Analytics & Historical Reports</h2>
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex space-x-4">
+                                <button class="px-4 py-2 bg-[#007BFF] text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 btn-hover">All Patients</button>
+                                <button class="px-4 py-2 bg-[#E6E6FA] text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 btn-hover">Critical Cases</button>
+                                <button class="px-4 py-2 bg-[#E6E6FA] text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 btn-hover">Billing/Financial</button>
+                            </div>
+                            <button class="px-6 py-3 bg-[#00C49A] text-white rounded-xl hover:bg-[#00A17E] transition-colors duration-200 btn-hover">Export Report</button>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-gray-50 p-6 rounded-2xl transition-all duration-200 card-hover">
+                                <h3 class="text-xl font-semibold mb-4">Patient Visits Trend (Monthly)</h3>
+                                <div class="h-48 bg-[#E6E6FA] flex items-center justify-center rounded-lg text-gray-500">
+                                    [Placeholder for Line Graph: Patient Volume vs. Time]
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-2xl transition-all duration-200 card-hover">
+                                <h3 class="text-xl font-semibold mb-4">Common Conditions (Last 30 Days)</h3>
+                                <div class="h-48 bg-[#E6E6FA] flex items-center justify-center rounded-lg text-gray-500">
+                                    [Placeholder for Pie Chart: Diagnosis Distribution]
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-2xl transition-all duration-200 card-hover lg:col-span-2">
+                                <h3 class="text-xl font-semibold mb-4">Billing Performance & Claim Velocity</h3>
+                                <div class="h-48 bg-[#E6E6FA] flex items-center justify-center rounded-lg text-gray-500">
+                                    [Placeholder for Bar Chart: Average Claim Cycle Time]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="settings-view" class="hidden bg-white p-8 rounded-3xl shadow-lg max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-bold text-[#B57EDC] mb-6">Account & System Configuration</h2>
+                    <form>
+                        <div class="mb-4">
+                            <label for="new-email" class="block text-sm font-semibold text-gray-700 mb-2">Update Email</label>
+                            <input type="email" id="new-email" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="dr.name@clinic.com">
+                        </div>
+                        <div class="mb-4">
+                            <label for="new-password" class="block text-sm font-semibold text-gray-700 mb-2">Change Password</label>
+                            <input type="password" id="new-password" class="w-full px-4 py-2 border border-[#E6E6FA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#007BFF]" placeholder="••••••••">
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 mb-3">System Preferences</h3>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                <label for="alert-level" class="text-sm font-medium text-gray-700">Critical Alert Threshold</label>
+                                <select id="alert-level" class="px-3 py-1 border border-gray-300 rounded-lg">
+                                    <option>High (Default)</option>
+                                    <option>Medium</option>
+                                    <option>Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" class="px-6 py-3 bg-[#007BFF] text-white rounded-xl hover:bg-blue-600 transition-colors duration-200 btn-hover">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+                </div>
+        </main>
+        </div>
+    <script>
+        const loginPage = document.getElementById('login-page');
+        const appContainer = document.getElementById('app-container');
+        const pageTitle = document.getElementById('page-title');
+        const navLinks = document.querySelectorAll('aside nav ul li a');
+
+        const views = {
+            'dashboard-view': 'Dashboard',
+            'patient-form-view': 'Patients',
+            'results-view': 'Results',
+            'reports-view': 'Reports',
+            'settings-view': 'Settings'
+        };
+
+        function showView(viewId) {
+            // Hide all content views
+            for (const id in views) {
+                const view = document.getElementById(id);
+                if (view) {
+                    view.classList.add('hidden');
+                }
+            }
+            // Show the requested view
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
+            pageTitle.textContent = views[viewId];
+
+            // Update active navigation link
+            navLinks.forEach(link => {
+                link.classList.remove('bg-[#E6E6FA]', 'text-[#1B4965]');
+                link.classList.add('text-gray-700');
+            });
+            const activeLink = document.querySelector(`a[onclick*="${viewId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('bg-[#E6E6FA]', 'text-[#1B4965]');
+                activeLink.classList.remove('text-gray-700');
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            loginPage.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            showView('dashboard-view'); // Show dashboard after login
+        });
+
+        function logout() {
+            loginPage.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+            // Reset form fields
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            // Ensure dashboard is the default view for next login
+            navLinks.forEach(link => {
+                link.classList.remove('bg-[#E6E6FA]', 'text-[#1B4965]');
+                link.classList.add('text-gray-700');
+            });
+            const dashboardLink = document.querySelector(`a[onclick*="dashboard-view"]`);
+            if (dashboardLink) {
+                dashboardLink.classList.add('bg-[#E6E6FA]', 'text-[#1B4965]');
+                dashboardLink.classList.remove('text-gray-700');
+            }
+        }
+
+        // Initialize with dashboard view on page load (after login simulation)
+        window.addEventListener('load', () => {
+            if (!appContainer.classList.contains('hidden')) {
+                showView('dashboard-view');
+            }
+        });
+    </script>
+
+</body>
+</html>
