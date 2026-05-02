@@ -36,6 +36,5 @@ Requirements: An active internet connection is required to load the Tailwind CSS
 Technical Notes
 Frontend UI Only: This project is a user interface prototype; it does not include a backend or a database.  
 
-Optimization: The interface is currently designed for Desktop view only.  
 
-Contact: Ram@gmail.com
+Contact: 2024-cs-074@uvas.edu.pk
