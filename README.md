@@ -37,4 +37,4 @@ Technical Notes
 Frontend UI Only: This project is a user interface prototype; it does not include a backend or a database.  
 
 
-Contact: 2024-cs-074@uvas.edu.pk
+
